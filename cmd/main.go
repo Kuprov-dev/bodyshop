@@ -11,6 +11,7 @@ import (
 
 	"bodyshop/pkg/bodyshop"
 	"bodyshop/pkg/db"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -33,13 +34,13 @@ func main() {
 		}
 	}()
 
-	t := db.MongoTemplateDAO{}
+	t := &db.MongoTemplateDAO{}
 
 	mux := http.NewServeMux()
 
 	fmt.Println("Server started...")
 
-	mux.Handle("/create_send_task", bodyshop.CreateSendTask(&mClient, &t))
+	mux.Handle("/create_send_task", bodyshop.CreateSendTask(mClient, t))
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop,

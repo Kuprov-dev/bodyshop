@@ -8,6 +8,7 @@ import (
 	"io"
 
 	"bodyshop/pkg/models"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -38,7 +39,7 @@ func (*MongoTemplateDAO) GetTemplate(ctx context.Context, mClient *mongo.Client,
 	}
 
 	var data models.Template
-	err := mCollection.FindOne(ctx, filter).Decode(&t)
+	err = mCollection.FindOne(ctx, filter).Decode(&t)
 	if err != nil {
 		panic(err)
 	}
