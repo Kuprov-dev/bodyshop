@@ -7,7 +7,7 @@ import (
 	"html/template"
 	"io"
 
-	"github.com/ddbelyaev/bodyshop/pkg/models"
+	"bodyshop/pkg/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ddbelyaev/bodyshop/pkg/db"
+	"bodyshop/pkg/db"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )

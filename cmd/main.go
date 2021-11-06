@@ -9,8 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/ddbelyaev/bodyshop/pkg/bodyshop"
-	"github.com/ddbelyaev/bodyshop/pkg/db"
+	"bodyshop/pkg/bodyshop"
+	"bodyshop/pkg/db"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
