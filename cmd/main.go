@@ -33,7 +33,7 @@ func main() {
 		}
 	}()
 
-	templateDAO := db.MongoTemplateDAO{}
+	t := db.MongoTemplateDAO{}
 
 	mux := http.NewServeMux()
 
