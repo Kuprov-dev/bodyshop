@@ -1,39 +1,39 @@
 package bodyshop
 
 import (
+	"bodyshop/pkg/schemes"
+	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"bodyshop/pkg/db"
-
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateSendTask(mClient *mongo.Client, t db.TemplateDAO) http.HandlerFunc {
+func (app *App) CreateSendTask() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			if r.Body == nil {
-				http.Error(w, "Please send a request body", 400)
-				return
-			}
+		if r.Body == nil {
+			http.Error(w, "Please send a request body", 400)
+			return
+		}
 
-			ctx := r.Context()
+		var createTaskRequest schemes.CreateSendTaskRequest
+		if err := json.NewDecoder(r.Body).Decode(&createTaskRequest); err != nil {
+			http.Error(w, "Error decoding request", 400)
 
-			template, err := t.GetTemplate(ctx, mClient, r.Body)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				fmt.Println(err)
-				return
-			}
+			return
+		}
 
-			err = t.WriteTemplate(ctx, mClient, template)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
+		err := createSendMailTask(r.Context(), createTaskRequest)
 
-		} else {
-			fmt.Fprintf(w, "Only POST method supported for this route")
+		template, err := app.TemplateDAO.GetTemplate(r.Context(), templateUUID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			fmt.Println(err)
+			return
+		}
+
+		err = t.WriteTemplate(ctx, mClient, template)
+		if err != nil {
+			fmt.Println(err)
+			return
 		}
 	}
 }
