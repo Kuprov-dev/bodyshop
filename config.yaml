@@ -1,0 +1,19 @@
+# Server configurations
+server:
+  host: "0.0.0.0"
+  port: 8001
+  prefix: "auth"
+  jwt_access_secret: "epstein didnt kill himself"
+  jwt_refresh_secret: "There was no Cold War in reality, it was just a cover for two allies to build super advanced militaries to prepare for alien invasion"
+
+# Teampltes database credentials
+templates_database:
+  user: "user"
+  password: "password"
+  templates_collection: "templates"
+
+# TasksQueue database credentials
+tasks_queue_database:
+  user: "user"
+  password: "password"
+  tasks_queue_collection: "tasks_queue"

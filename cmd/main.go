@@ -1,46 +1,44 @@
 package main
 
 import (
-	"context"
+	"bodyshop/pkg/bodyshop"
+	"bodyshop/pkg/conf"
+	"bodyshop/pkg/db"
+	logging "bodyshop/pkg/log"
+	"bodyshop/pkg/providers"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"bodyshop/pkg/bodyshop"
-	"bodyshop/pkg/db"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
-const PORT string = ":8080"
-const connectionString string = "mongodb://localhost:27017/"
+const (
+	PORT             string = ":8080"
+	connectionString string = "mongodb://localhost:27017/"
+)
 
 func main() {
-	ctx := context.Background()
+	config := conf.New()
+	log := logrus.New()
+	log.SetFormatter(&logrus.JSONFormatter{})
+	logEntry := logrus.NewEntry(log)
 
-	cOpts := options.Client().ApplyURI(connectionString)
-	mClient, err := mongo.Connect(ctx, cOpts)
-	if err != nil {
-		panic(err)
+	mailsenderService := &providers.HTTPMailsenderServiceProvider{Config: config}
+	templateDAO := &db.MongoTemplateDAO{}
+
+	app := bodyshop.App{
+		Config:            config,
+		MailsenderService: mailsenderService,
+		Logger:            logEntry,
+		TemplateDAO:       templateDAO,
 	}
 
-	defer func() {
-		if err := mClient.Disconnect(ctx); err != nil {
-			panic(err)
-		}
-	}()
-
-	t := &db.MongoTemplateDAO{}
-
-	mux := http.NewServeMux()
-
-	fmt.Println("Server started...")
-
-	mux.Handle("/create_send_task", bodyshop.CreateSendTask(mClient, t))
+	r := mux.NewRouter()
+	r.Handle("/create_send_task", app.CreateSendTask()).Methods(http.MethodPost)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop,
@@ -50,13 +48,16 @@ func main() {
 		syscall.SIGQUIT,
 	)
 
+	handler := logging.LoggingMiddleware(logEntry)(r)
+
 	s := &http.Server{
 		Addr:    PORT,
-		Handler: mux,
+		Handler: handler,
 	}
 	defer s.Close()
 
 	go func() {
+		fmt.Println("Server started...")
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Println(err)
 			return
@@ -66,5 +67,4 @@ func main() {
 	<-stop
 
 	fmt.Println("Server stopped...")
-
 }

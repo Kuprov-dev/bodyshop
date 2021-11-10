@@ -3,33 +3,33 @@ kind: Deployment
 metadata:
   name: <DEPLOYMENT_NAME>
   labels:
-    app: nginx
+    app: bodyshop
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth-service
+      app: bodyshop-service
   template:
     metadata:
       labels:
-        app: auth-service
+        app: bodyshop-service
     spec:
       terminationGracePeriodSeconds: 30
       containers:
-      - name: auth
-        image: registry.gitlab.com/golang-developer-cloudmts_main/team201/auth:main
+      - name: bodyshop
+        image: registry.gitlab.com/golang-developer-cloudmts_main/team201/bodyshop:main
         imagePullPolicy: "Always"
         ports:
-        - containerPort: 8000
+        - containerPort: 8002
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-service
+  name: bodyshop-service
 spec:
   selector:
-    app: auth-service
+    app: bodyshop-service
   ports:
     - protocol: TCP
-      port: 8000
-      targetPort: 8000
+      port: 8002
+      targetPort: 8002
