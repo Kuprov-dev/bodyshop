@@ -63,10 +63,18 @@ func (c *Config) TemplatesCollection() string {
 	return c.TemplatesDatabase.TemplatesCollection
 }
 
+func (c *Config) TemplatesDBName() string {
+	return c.TemplatesDatabase.DBName
+}
+
 func (c *Config) TasksQueueDatabaseURI() string {
 	return fmt.Sprintf("%s:%s", c.TasksQueueDatabase.Host, c.TasksQueueDatabase.Port)
 }
 
 func (c *Config) TasksQueueCollection() string {
 	return c.TasksQueueDatabase.TasksQueueCollection
+}
+
+func (c *Config) TasksQueueDBName() string {
+	return c.TemplatesDatabase.DBName
 }

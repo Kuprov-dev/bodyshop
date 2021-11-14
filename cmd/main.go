@@ -2,18 +2,16 @@ package main
 
 import (
 	"bodyshop/pkg/bodyshop"
-	"bodyshop/pkg/conf"
-	"bodyshop/pkg/db"
 	logging "bodyshop/pkg/log"
-	"bodyshop/pkg/providers"
+	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -22,20 +20,7 @@ const (
 )
 
 func main() {
-	config := conf.New()
-	log := logrus.New()
-	log.SetFormatter(&logrus.JSONFormatter{})
-	logEntry := logrus.NewEntry(log)
-
-	mailsenderService := &providers.HTTPMailsenderServiceProvider{Config: config}
-	templateDAO := &db.MongoTemplateDAO{}
-
-	app := bodyshop.App{
-		Config:            config,
-		MailsenderService: mailsenderService,
-		Logger:            logEntry,
-		TemplateDAO:       templateDAO,
-	}
+	app := bodyshop.NewApp(context.Background())
 
 	r := mux.NewRouter()
 	r.Handle("/create_send_task", app.CreateSendTask()).Methods(http.MethodPost)
@@ -48,7 +33,7 @@ func main() {
 		syscall.SIGQUIT,
 	)
 
-	handler := logging.LoggingMiddleware(logEntry)(r)
+	handler := logging.LoggingMiddleware(app.Logger)(r)
 
 	s := &http.Server{
 		Addr:    PORT,

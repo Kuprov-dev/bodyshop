@@ -3,7 +3,7 @@ package bodyshop
 import (
 	"bodyshop/pkg/schemes"
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -21,19 +21,14 @@ func (app *App) CreateSendTask() http.HandlerFunc {
 			return
 		}
 
-		err := createSendMailTask(r.Context(), createTaskRequest)
-
-		template, err := app.TemplateDAO.GetTemplate(r.Context(), templateUUID)
+		_, err := CreateSendMailTask(r.Context(), createTaskRequest, app.TemplateDAO, app.TasksQueueDAO)
 		if err != nil {
+			log.Println(err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
-			fmt.Println(err)
+
 			return
 		}
 
-		err = t.WriteTemplate(ctx, mClient, template)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+		w.Write([]byte("Ok"))
 	}
 }
