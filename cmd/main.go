@@ -4,7 +4,6 @@ import (
 	"bodyshop/pkg/bodyshop"
 	logging "bodyshop/pkg/log"
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -12,11 +11,6 @@ import (
 	"syscall"
 
 	"github.com/gorilla/mux"
-)
-
-const (
-	PORT             string = ":8080"
-	connectionString string = "mongodb://localhost:27017/"
 )
 
 func main() {
@@ -36,20 +30,22 @@ func main() {
 	handler := logging.LoggingMiddleware(app.Logger)(r)
 
 	s := &http.Server{
-		Addr:    PORT,
+		Addr:    app.Config.ServerAddr(),
 		Handler: handler,
 	}
 	defer s.Close()
 
 	go func() {
-		fmt.Println("Server started...")
+		log.Println("Server started...")
+
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Println(err)
+
 			return
 		}
 	}()
 
 	<-stop
 
-	fmt.Println("Server stopped...")
+	log.Println("Server stopped...")
 }
