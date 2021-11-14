@@ -8,5 +8,5 @@ import (
 )
 
 type TemplateDAO interface {
-	GetTemplateByUUID(ctx context.Context, templateUUID primitive.ObjectID) (*models.Template, error)
+	GetTemplateByUUID(ctx context.Context, templateUUID primitive.ObjectID) (*models.HTMLTeplate, error)
 }

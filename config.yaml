@@ -11,9 +11,17 @@ templates_database:
   user: "user"
   password: "password"
   templates_collection: "templates"
+  # host: "mongodb://profile-mongodb-service"
+  # port: 27017
+  host: "mongodb://192.168.49.2"
+  port: 30003
 
 # TasksQueue database credentials
 tasks_queue_database:
   user: "user"
   password: "password"
   tasks_queue_collection: "tasks_queue"
+  # host: "mongodb://bodyshop-mongodb-service"
+  # port: 27017
+  host: "mongodb://192.168.49.2"
+  port: 30003

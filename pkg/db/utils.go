@@ -10,29 +10,48 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var mongoDBConnection *mongo.Database
+var (
+	templatesDBConnection  *mongo.Database
+	tasksQueueDBConnection *mongo.Database
+)
 
-func ConnectMongoDB(ctx context.Context, config *conf.Config) {
+func ConnectMongoDB(ctx context.Context, dbURI string, dbName string) (*mongo.Database, error) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.DatabaseURI()))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbURI))
 	if err != nil {
-		cancel()
-		log.Fatal(err)
+		return nil, err
 	}
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		cancel()
-		log.Fatal(err)
+		return nil, err
 	}
 
-	mongoDBConnection = client.Database(config.Database.DBName)
+	dbConnection := client.Database(dbName)
 
 	log.Println("Connection to DB success")
+
+	return dbConnection, nil
 }
 
-func GetMongoDBConnection() *mongo.Database {
-	return mongoDBConnection
+func GetTemplatesDBConnection(ctx context.Context, config *conf.Config) (*mongo.Database, error) {
+	var err error
+
+	if templatesDBConnection == nil {
+		templatesDBConnection, err = ConnectMongoDB(ctx, config.TemplatesDatabaseURI(), config.TemplatesDBName())
+	}
+
+	return templatesDBConnection, err
+}
+
+func GetTasksQueueDBConnection(ctx context.Context, config *conf.Config) (*mongo.Database, error) {
+	var err error
+
+	if tasksQueueDBConnection == nil {
+		tasksQueueDBConnection, err = ConnectMongoDB(ctx, config.TasksQueueCollection(), config.TasksQueueDBName())
+	}
+
+	return tasksQueueDBConnection, err
 }
